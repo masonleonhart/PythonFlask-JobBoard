@@ -81,7 +81,7 @@ def employer(employer_id):
 
 @app.route("/employer/<employer_id>/review", methods=['GET', 'POST'])
 def review(employer_id):
-    if request.method is "POST":
+    if request.method == "POST":
         review_text = request.form['review']
         rating = request.form['rating']
         title = request.form['title']
@@ -92,9 +92,9 @@ def review(employer_id):
                     VALUES (?, ?, ?, ?, ?, ?)'''
 
         execute_sql(
-            sql,
-            (review_text, rating, title, date, status, employer_id),
-            commit=True
+            'INSERT INTO review (review, rating, title, date, status, '
+            'employer_id) VALUES (?, ?, ?, ?, ?, ?)',
+            (review_text, rating, title, date, status, employer_id), commit=True
             )
 
         return redirect(url_for('employer', employer_id=employer_id))

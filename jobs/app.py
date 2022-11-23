@@ -69,7 +69,10 @@ def employer(employer_id):
                         JOIN employer ON employer.id = review.employer_id
                         WHERE employer.id = ?'''
 
-    employer = execute_sql('SELECT * FROM employer WHERE id=?', [employer_id], single=True)
-    jobs = execute_sql('SELECT job.id, job.title, job.description, job.salary FROM job JOIN employer ON employer.id = job.employer_id WHERE employer.id = ?', [employer_id])
-    reviews = execute_sql('SELECT review, rating, title, date, status FROM review JOIN employer ON employer.id = review.employer_id WHERE employer.id = ?', [employer_id])
-    return render_template("employer.html", employer=employer, jobs=jobs, reviews=reviews)
+    employer_obj = execute_sql(employer_sql, [employer_id], single=True)
+    jobs_list = execute_sql(jobs_sql, [employer_id])
+    reviews_list = execute_sql(reviews_sql, [employer_id])
+    return render_template(
+        "employer.html", employer=employer_obj, jobs=jobs_list,
+        reviews=reviews_list
+        )

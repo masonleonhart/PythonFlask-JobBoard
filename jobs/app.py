@@ -44,15 +44,35 @@ def jobs():
                 as employer_id, employer.name as employer_name FROM job JOIN 
                 employer ON employer.id = job.employer_id'''
 
-    jobs = execute_sql(sql)
-    return render_template('index.html', jobs=jobs)
+    jobs_list = execute_sql(sql)
+    return render_template('index.html', jobs=jobs_list)
 
 
 @app.route("/job/<job_id>")
 def job(job_id):
     sql = '''SELECT job.id, job.title, job.description, job.salary, 
-    employer.id as employer_id, employer.name as employer_name FROM job JOIN 
-    employer ON employer.id = job.employer_id WHERE job.id = ?'''
+                employer.id as employer_id, employer.name as employer_name
+                FROM job JOIN employer ON employer.id = job.employer_id 
+                WHERE job.id = ?'''
 
-    job = execute_sql(sql, [job_id], single=True)
-    return render_template('job.html', job=job)
+    job_obj = execute_sql(sql, [job_id], single=True)
+    return render_template('job.html', job=job_obj)
+
+
+@app.route("/employer/<employer_id>")
+def employer(employer_id):
+    employer_sql = 'SELECT * FROM employer WHERE id=?'
+    jobs_sql = '''SELECT job.id, job.title, job.description, job.salary
+                    FROM job JOIN employer ON employer.id = job.employer_id
+                    WHERE employer.id = ?'''
+    reviews_sql = '''SELECT review, rating, title, date, status FROM review
+                        JOIN employer ON employer.id = review.employer_id
+                        WHERE employer.id = ?'''
+
+    employer_obj = execute_sql(employer_sql, [employer_id], single=True)
+    jobs_list = execute_sql(jobs_sql, [employer_id])
+    reviews_list = execute_sql(reviews_sql, [employer_id])
+    return render_template(
+        "employer.html", employer=employer_obj, jobs=jobs_list,
+        reviews=reviews_list
+        )
